@@ -1,0 +1,102 @@
+complete examples per dataset: {'2wikimqa': 30, 'hotpotqa': 30, 'needle': 30, 'qasper': 30}
+
+TABLE 1. Task score x100 (F1 for QA, recall for needle). Columns: dataset / fraction of context kept.
+                        2wikimqa             hotpotqa             needle             qasper             AVERAGE            
+ratio                       0.02  0.05  0.10     0.02  0.05  0.10   0.02  0.05  0.10   0.02  0.05  0.10    0.02  0.05  0.10
+Method                                                                                                                     
+Random                      28.4  31.1  31.1     33.3  30.7  29.6    0.0   0.0   0.0   21.5  26.5  28.6    20.8  22.1  22.3
+StreamingLLM                28.0  28.0  28.0     29.7  29.7  29.7    3.3   6.7  15.0   18.7  20.9  29.1    19.9  21.3  25.5
+H2O                         30.5  32.8  31.1     34.7  34.1  36.2    1.7   1.7   3.3   28.1  27.5  34.6    23.7  24.0  26.3
+SnapKV                      32.2  32.8  33.9     37.1  39.3  38.6    3.3  43.3  81.7   22.6  24.1  33.1    23.8  34.9  46.8
+SnapKV + CGR (ours)         40.0  36.4  28.1     37.0  38.0  38.6   93.3  96.7  98.3   31.5  37.4  36.6    50.5  52.1  50.4
+SnapKV + random trigger     33.6  32.8  36.6     37.2  39.0  38.4   33.3  60.0  85.0   27.2  33.8  35.6    32.8  41.4  48.9
+SnapKV + always recover     37.6  42.4  35.7     38.4  38.4  38.4   96.7  98.3  98.3   31.9  34.9  35.4    51.1  53.5  52.0
+
+Full cache: {'2wikimqa': 38.0, 'hotpotqa': 38.4, 'needle': 98.3, 'qasper': 36.6} | average 52.8
+
+TABLE 1b. Agreement with the uncompressed model's answer x100 (token F1).
+                        2wikimqa             hotpotqa               needle               qasper             AVERAGE            
+ratio                       0.02  0.05  0.10     0.02   0.05   0.10   0.02   0.05   0.10   0.02  0.05  0.10    0.02  0.05  0.10
+Method                                                                                                                         
+Random                      52.0  54.7  54.1     56.9   56.9   57.5    0.0    0.0    0.0   41.1  45.6  47.3    37.5  39.3  39.7
+StreamingLLM                49.2  54.3  52.8     56.8   60.5   62.7    3.3    6.7   15.0   42.5  45.2  51.4    38.0  41.7  45.5
+H2O                         51.7  56.6  58.9     68.4   68.9   79.1    1.7    1.7    3.3   45.6  48.3  58.4    41.8  43.9  49.9
+SnapKV                      63.9  67.3  82.1     78.0   80.3   95.3    3.3   43.9   80.6   49.4  52.3  68.0    48.7  60.9  81.5
+SnapKV + CGR (ours)         82.4  84.2  86.5     89.5   93.3   99.7   95.6   98.3  100.0   60.3  71.3  75.0    81.9  86.8  90.3
+SnapKV + random trigger     67.3  66.5  80.5     84.8   93.9   98.9   35.0   61.7   86.7   58.5  61.7  74.7    61.4  70.9  85.2
+SnapKV + always recover     79.1  88.6  95.6     99.3  100.0  100.0   98.9  100.0  100.0   65.4  74.3  81.2    85.7  90.7  94.2
+TABLE 2. Recovery behaviour (all datasets pooled). recover_ms = wall time of one recovery incl. the re-decoded step.
+ ratio  score  fidelity                name  trigger_rate_pct  examples_triggered_pct  token_changed_pct  triggers  slots_swapped_pct  conf_gain  recover_ms
+  0.02  23.78     48.66              snapkv               NaN                     NaN                NaN       NaN                NaN        NaN         NaN
+  0.02  49.62     79.35 snapkv+cgr(tau=0.5)              8.72                   60.00              44.44     117.0              21.89       0.44      134.83
+  0.02  32.83     61.41     snapkv+randtrig             10.15                   51.67              24.17     120.0              19.59       0.11      137.44
+  0.02  50.47     81.92 snapkv+cgr(tau=0.7)             13.76                   70.83              40.72     167.0              20.33       0.32      137.44
+  0.02  52.79     83.56 snapkv+cgr(tau=0.9)             21.49                   84.17              30.61     245.0              19.47       0.18      136.86
+  0.02  51.14     85.69       snapkv+always            100.00                  100.00               5.25    1201.0              10.70       0.01      139.34
+  0.05  34.87     60.94              snapkv               NaN                     NaN                NaN       NaN                NaN        NaN         NaN
+  0.05  49.83     81.02 snapkv+cgr(tau=0.5)              7.18                   49.17              36.08      97.0              23.74       0.33      145.67
+  0.05  41.39     70.94     snapkv+randtrig              9.85                   51.67              12.40     121.0              23.05       0.05      144.98
+  0.05  52.12     86.80 snapkv+cgr(tau=0.7)             12.92                   65.83              26.38     163.0              22.48       0.21      147.42
+  0.05  52.40     88.10 snapkv+cgr(tau=0.9)             18.62                   78.33              23.33     210.0              21.44       0.13      151.26
+  0.05  53.51     90.72       snapkv+always            100.00                  100.00               3.66    1337.0              10.73       0.00      148.40
+  0.10  46.82     81.49              snapkv               NaN                     NaN                NaN       NaN                NaN        NaN         NaN
+  0.10  51.18     87.57 snapkv+cgr(tau=0.5)              4.63                   38.33              33.73      83.0              22.90       0.19      165.50
+  0.10  48.90     85.19     snapkv+randtrig             10.09                   45.83               4.80     125.0              21.75       0.04      165.93
+  0.10  50.40     90.32 snapkv+cgr(tau=0.7)             12.33                   59.17              25.85     147.0              22.18       0.15      162.91
+  0.10  50.97     90.25 snapkv+cgr(tau=0.9)             17.44                   74.17              15.96     213.0              20.25       0.09      170.95
+  0.10  51.98     94.19       snapkv+always            100.00                  100.00               2.18    1333.0               9.76       0.01      167.66
+
+TABLE 3. Paired differences in score x100 with 95% bootstrap intervals (an interval that excludes 0 is significant).
+ ratio                     comparison  mean_diff  ci_low  ci_high   n
+  0.02                  ours - SnapKV      26.69   19.41    34.51 120
+  0.02 ours - SnapKV + random trigger      17.64   11.34    24.54 120
+  0.02 ours - SnapKV + always recover      -0.67   -4.83     3.55 120
+  0.05                  ours - SnapKV      17.24   11.42    23.64 120
+  0.05 ours - SnapKV + random trigger      10.73    5.85    16.16 120
+  0.05 ours - SnapKV + always recover      -1.39   -4.03     0.80 120
+  0.10                  ours - SnapKV       3.57   -0.14     7.51 120
+  0.10 ours - SnapKV + random trigger       1.49   -1.94     5.14 120
+  0.10 ours - SnapKV + always recover      -1.58   -4.09     0.32 120
+
+TABLE 4. Memory and speed (means over all examples). backup_cpu_mb is the CPU RAM our method adds.
+               name  ratio  gpu_kv_mb  backup_cpu_mb  kept_tokens  prompt_tokens  ms_per_token  prefill_s  gpu_kv_saving_pct
+               full   1.00     302.53           0.00      5532.06        5532.06         64.55        9.6               0.00
+             snapkv   0.02       7.76           0.00       141.96        5532.06         59.04        9.6              97.43
+             snapkv   0.05      16.79           0.00       307.00        5532.06         61.45        9.6              94.45
+             snapkv   0.10      31.84           0.00       582.14        5532.06         58.62        9.6              89.48
+snapkv+cgr(tau=0.7)   0.02       7.76         300.78       141.96        5532.06         91.09        9.6              97.43
+snapkv+cgr(tau=0.7)   0.05      16.79         300.78       307.00        5532.06         80.98        9.6              94.45
+snapkv+cgr(tau=0.7)   0.10      31.84         300.78       582.14        5532.06         77.22        9.6              89.48
+477 recoveries in total
+budget 2%: recovery changed the answer on 68 of 120 examples; better on 52, worse on 6
+
+[2wikimqa #10]
+  full   : '1373'
+  snapkv : '1626'  (score 0.00)
+  ours   : '16 September 1360'  (score 1.00, 2 recoveries)
+
+[2wikimqa #12]
+  full   : '3 September 1992'
+  snapkv : '3000 BCE'  (score 0.00)
+  ours   : '3 September 1992'  (score 1.00, 2 recoveries)
+
+[needle #0]
+  full   : '1679215\n5343902'
+  snapkv : '1679254'  (score 0.00)
+  ours   : '1679215\n5343902'  (score 1.00, 2 recoveries)
+
+[needle #2]
+  full   : '5728454\n3344545'
+  snapkv : '572945'  (score 0.00)
+  ours   : '5728454\n3344545'  (score 1.00, 1 recoveries)
+
+[needle #3]
+  full   : '6203412\n2656973'
+  snapkv : '620391'  (score 0.00)
+  ours   : '6203412\n2656973'  (score 1.00, 2 recoveries)
+
+[needle #4]
+  full   : '2689485\n6935633'
+  snapkv : '2689343'  (score 0.00)
+  ours   : '2689485\n6935633'  (score 1.00, 1 recoveries)
+

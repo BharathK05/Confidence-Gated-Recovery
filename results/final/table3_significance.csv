@@ -1,0 +1,10 @@
+ratio,comparison,mean_diff,ci_low,ci_high,n
+0.02,ours - SnapKV,26.69,19.41,34.51,120
+0.02,ours - SnapKV + random trigger,17.64,11.34,24.54,120
+0.02,ours - SnapKV + always recover,-0.67,-4.83,3.55,120
+0.05,ours - SnapKV,17.24,11.42,23.64,120
+0.05,ours - SnapKV + random trigger,10.73,5.85,16.16,120
+0.05,ours - SnapKV + always recover,-1.39,-4.03,0.8,120
+0.1,ours - SnapKV,3.57,-0.14,7.51,120
+0.1,ours - SnapKV + random trigger,1.49,-1.94,5.14,120
+0.1,ours - SnapKV + always recover,-1.58,-4.09,0.32,120

@@ -1,0 +1,13 @@
+# kept out of the repository
+Legacy Code/
+Materials/
+cgr_outputs/
+
+# only the final run's results are tracked
+results/*
+!results/final/
+
+__pycache__/
+.pytest_cache/
+*.pyc
+.ipynb_checkpoints/
